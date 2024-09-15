@@ -1,0 +1,57 @@
+python manage.py shell
+
+from django.contrib.auth.models import User
+from news.models import Author, Category, Post, PostCategory, Comment
+
+user1 = User.objects.create_user('user1', 'user1@example.com', 'password123')
+user2 = User.objects.create_user('user2', 'user2@example.com', 'password123')
+
+author1 = Author.objects.create(user=user1)
+author2 = Author.objects.create(user=user2)
+
+category1 = Category.objects.create(name='Спорт')
+category2 = Category.objects.create(name='Политика')
+category3 = Category.objects.create(name='Образование')
+category4 = Category.objects.create(name='Технологии')
+
+post1 = Post.objects.create(author=author1, type=Post.ARTICLE, title='Первая статья', text='Текст первой статьи...')
+post2 = Post.objects.create(author=author2, type=Post.ARTICLE, title='Вторая статья', text='Текст второй статьи...')
+news1 = Post.objects.create(author=author1, type=Post.NEWS, title='Первая новость', text='Текст первой новости...')
+
+
+PostCategory.objects.create(post=post1, category=category1)
+PostCategory.objects.create(post=post1, category=category2)
+PostCategory.objects.create(post=post2, category=category3)
+PostCategory.objects.create(post=news1, category=category4)
+
+
+comment1 = Comment.objects.create(post=post1, user=user2, text='Отличная статья!')
+comment2 = Comment.objects.create(post=post2, user=user1, text='Полезная информация')
+comment3 = Comment.objects.create(post=news1, user=user2, text='Интересная новость')
+comment4 = Comment.objects.create(post=news1, user=user1, text='Спасибо за новость')
+
+
+post1.like()  
+post2.dislike()  
+news1.like()  
+comment1.like()  
+comment2.dislike() 
+comment3.like()  
+comment4.like() 
+
+
+author1.update_rating()
+author2.update_rating()
+
+
+best_author = Author.objects.order_by('-rating').first()
+print(best_author.user.username, best_author.rating)
+
+
+best_post = Post.objects.order_by('-rating').first()
+print(best_post.created_at, best_post.author.user.username, best_post.rating, best_post.title, best_post.preview())
+
+
+comments = Comment.objects.filter(post=best_post)
+for comment in comments:
+    print(comment.created_at, comment.user.username, comment.rating, comment.text)
