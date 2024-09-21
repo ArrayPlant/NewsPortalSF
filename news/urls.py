@@ -16,7 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', views.news_list, name='news_list'),  # Добавьте этот путь для корневого URL
+    path('news/', views.news_list, name='news_list'),
+    path('news/<int:news_id>/', views.news_detail, name='news_detail'),
 ]

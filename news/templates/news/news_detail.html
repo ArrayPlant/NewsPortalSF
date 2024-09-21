@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+1{% load custom_filters %}
+{% load static %}
+
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ article.title|censor }}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header>
+        <h1>{{ article.title|censor }}</h1>
+    </header>
+    <main>
+        <p>Дата публикации: {{ article.publication_date|date:"d.m.Y" }}</p>
+        <p>{{ article.content|censor }}</p> <!-- Применяем фильтр к тексту -->
+    </main>
+    <footer>
+        <p>&copy; 2024 Новости</p>
+    </footer>
+</body>
+</html>
