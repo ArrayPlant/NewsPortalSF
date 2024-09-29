@@ -74,3 +74,4 @@ class News(models.Model):
     pub_date = models.DateTimeField('date published')
     def __str__(self):
         return self.title
+

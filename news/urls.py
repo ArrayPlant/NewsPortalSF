@@ -17,10 +17,28 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from . import views
+from .views import (
+    news_list, news_detail, news_search,
+    ArticleListView, NewsCreateView, NewsUpdateView, NewsDeleteView,
+    ArticleCreateView, ArticleUpdateView, ArticleDeleteView, ArticleDetailView )
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.news_list, name='news_list'),  # Добавьте этот путь для корневого URL
-    path('news/', views.news_list, name='news_list'),
-    path('news/<int:news_id>/', views.news_detail, name='news_detail'),
+    path('', views.news_list, name='news_list'),
+
+    path('news/', news_list, name='news_list'),
+    path('news/<int:news_id>/', news_detail, name='news_detail'),
+    path('news/search/', news_search, name='news_search'),
+
+    # CRUD для новостей
+    path('news/create/', NewsCreateView.as_view(), name='news_create'),
+    path('news/<int:pk>/edit/', NewsUpdateView.as_view(), name='news_update'),
+    path('news/<int:pk>/delete/', NewsDeleteView.as_view(), name='news_delete'),
+
+    # CRUD для статей
+    path('articles/', ArticleListView.as_view(), name='article_list'),
+    path('articles/create/', ArticleCreateView.as_view(), name='article_create'),
+    path('articles/<int:pk>/edit/', ArticleUpdateView.as_view(), name='article_update'),
+    path('articles/<int:pk>/delete/', ArticleDeleteView.as_view(), name='article_delete'),
+    path('articles/<int:pk>/', ArticleDetailView.as_view(), name='article_detail'),
 ]
