@@ -3,6 +3,7 @@ from django.core.paginator import Paginator
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from .models import Post, News, Author
 from .forms import NewsForm, ArticleForm, PostForm
@@ -37,7 +38,7 @@ class ArticleListView(ListView):
         return Post.objects.filter(type=Post.ARTICLE)
 
 
-class NewsCreateView(LoginRequiredMixin, CreateView):
+class NewsCreateView(PermissionRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
     template_name = 'news/news_form.html'
@@ -52,7 +53,7 @@ class NewsCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class NewsUpdateView(UpdateView):
+class NewsUpdateView(PermissionRequiredMixin, UpdateView):
     model = Post
     form_class = NewsForm
     template_name = 'news/news_form.html'
@@ -70,7 +71,7 @@ class NewsDeleteView(DeleteView):
         return Post.objects.filter(type=Post.NEWS)
 
 
-class ArticleCreateView(LoginRequiredMixin, CreateView):
+class ArticleCreateView(PermissionRequiredMixin, CreateView):
     model = Post
     form_class = PostForm
     template_name = 'news/news_form.html'
@@ -85,7 +86,7 @@ class ArticleCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class ArticleUpdateView(UpdateView):
+class ArticleUpdateView(PermissionRequiredMixin, UpdateView):
     model = Post
     form_class = ArticleForm
     template_name = 'news/article_form.html'
