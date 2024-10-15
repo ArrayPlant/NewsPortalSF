@@ -1,14 +1,19 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
 
-from .models import Post, News, Author
+from django.contrib.auth.decorators import login_required
+
+from .models import Post, News, Author, Category, Subscriber
 from .forms import NewsForm, ArticleForm, PostForm
 from .filters import NewsFilter
 
+from django.utils.timezone import now
+from django.core.mail import send_mail
+from datetime import timedelta
 
 def news_list(request):
     news_list = News.objects.all()
@@ -108,3 +113,41 @@ class ArticleDetailView(DetailView):
     model = Post
     template_name = 'news/article_detail.html'  # Укажите путь к шаблону
     context_object_name = 'article'
+
+
+@login_required
+def subscriptions_view(request):
+    user = request.user
+    categories = Category.objects.all()
+
+    if request.method == 'POST':
+        selected_categories = request.POST.getlist('categories')
+        Subscriber.objects.filter(user=user).delete()  # Удаляем все текущие подписки
+        for category_id in selected_categories:
+            category = Category.objects.get(id=category_id)
+            Subscriber.objects.create(user=user, category=category)
+
+        return redirect('subscriptions')
+
+    subscribed_categories = user.subscriptions.all().values_list('category__id', flat=True)
+    return render(request, 'subscriptions.html', {'categories': categories, 'subscribed_categories': subscribed_categories})
+
+
+def send_weekly_news():
+    last_week = now() - timedelta(days=7)
+    subscribers = Subscriber.objects.all()
+
+    for subscriber in subscribers:
+        articles = Post.objects.filter(
+            categories__in=subscriber.categories.all(),
+            published_date__gte=last_week
+        ).distinct()
+
+        if articles:
+            article_links = "\n".join([f"http://127.0.0.1:8000/articles/{article.id}/" for article in articles])
+            send_mail(
+                subject='Weekly news digest',
+                message=f'Here are the latest articles:\n{article_links}',
+                from_email='admin@newsportal.com',
+                recipient_list=[subscriber.user.email],
+            )

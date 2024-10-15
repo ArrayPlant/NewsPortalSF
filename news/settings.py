@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+
+    'django_apscheduler',
 ]
 
 SITE_ID = 1

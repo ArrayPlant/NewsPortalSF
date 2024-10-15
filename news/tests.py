@@ -1,3 +1,3 @@
-from django.test import TestCase
+from django_apscheduler.jobstores import DjangoJobStore
 
-# Create your tests here.
+print("django-apscheduler работает корректно")
