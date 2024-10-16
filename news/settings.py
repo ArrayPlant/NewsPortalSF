@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from pathlib import Path
 
+from celery.schedules import crontab
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -47,6 +49,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
 
     'django_apscheduler',
+
+    'django_celery_beat',
 ]
 
 SITE_ID = 1
@@ -60,6 +64,13 @@ LOGIN_REDIRECT_URL = '/news/'
 
 ACCOUNT_LOGOUT_ON_PASSWORD_CHANGE = False
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
