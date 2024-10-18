@@ -20,7 +20,7 @@ from . import views
 from .views import (
     news_list, news_detail, news_search,
     ArticleListView, NewsCreateView, NewsUpdateView, NewsDeleteView,
-    ArticleCreateView, ArticleUpdateView, ArticleDeleteView, ArticleDetailView )
+    ArticleCreateView, ArticleUpdateView, ArticleDeleteView, ArticleDetailView)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,6 +30,7 @@ urlpatterns = [
     path('news/', news_list, name='news_list'),
     path('news/<int:news_id>/', news_detail, name='news_detail'),
     path('news/search/', news_search, name='news_search'),
+    path('news/<int:news_id>/', news_detail, name='news_detail'),
 
     # CRUD для новостей
     path('news/create/', NewsCreateView.as_view(), name='news_create'),

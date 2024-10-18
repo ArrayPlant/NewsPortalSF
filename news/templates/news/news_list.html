@@ -1,7 +1,7 @@
-
-
 <!DOCTYPE html>
 {% load static %}
+{% load cache %}
+
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -10,14 +10,18 @@
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
+    {% cache 300 'news_list_header' %}
     <h1>Новости</h1>
+    {% endcache %}
 
     <div>
         {% for news_item in page_obj %}
+            {% cache 300 news_item.id %}
             <h2><a href="{% url 'news_detail' news_item.id %}">{{ news_item.title }}</a></h2>
             <p>{{ news_item.content|truncatewords:30 }}</p>
             <p>Опубликовано: {{ news_item.pub_date }}</p>
             <hr>
+            {% endcache %}
         {% empty %}
             <p>Нет доступных новостей.</p>
         {% endfor %}

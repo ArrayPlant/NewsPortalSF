@@ -10,11 +10,17 @@ from django.contrib.auth.decorators import login_required
 from .models import Post, News, Author, Category, Subscriber
 from .forms import NewsForm, ArticleForm, PostForm
 from .filters import NewsFilter
+from django.urls import reverse
 
 from django.utils.timezone import now
 from django.core.mail import send_mail
 from datetime import timedelta
 
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
+
+
+@cache_page(60 * 5)
 def news_list(request):
     news_list = News.objects.all()
     paginator = Paginator(news_list, 10)  # 10 новостей на страницу
@@ -23,8 +29,10 @@ def news_list(request):
     return render(request, 'news/news_list.html', {'page_obj': page_obj})
 
 
+@cache_page(60)
 def news_detail(request, news_id):
     news_item = get_object_or_404(News, pk=news_id)
+    print(News.objects.filter(pk=25).exists())
     return render(request, 'news/news_detail.html', {'news_item': news_item})
 
 
@@ -34,6 +42,7 @@ def news_search(request):
     return render(request, 'news/news_search.html', {'filter': news_filter})
 
 
+@method_decorator(cache_page(60 * 60, key_prefix=lambda request, view: f"article_{view.get_object().pk}_{view.get_object().updated_at.timestamp()}"), name='dispatch')
 class ArticleListView(ListView):
     model = Post
     template_name = 'news/article_list.html'
@@ -48,6 +57,7 @@ class NewsCreateView(PermissionRequiredMixin, CreateView):
     form_class = PostForm
     template_name = 'news/news_form.html'
     success_url = reverse_lazy('news_list')
+    permission_required = 'news.add_post'
 
     def form_valid(self, form):
         author, created = Author.objects.get_or_create(user=self.request.user)
@@ -55,13 +65,20 @@ class NewsCreateView(PermissionRequiredMixin, CreateView):
         post.author = author
         post.type = Post.NEWS
         post.save()
-        return super().form_valid(form)
+        print(Post.objects.last())
+        print(f"Created post ID: {post.pk}")
+        return redirect(reverse('news_detail', args=[post.pk]))
+
+    def form_invalid(self, form):
+        print(form.errors)  # Для отладки
+        return super().form_invalid(form)
 
 
 class NewsUpdateView(PermissionRequiredMixin, UpdateView):
     model = Post
     form_class = NewsForm
     template_name = 'news/news_form.html'
+    success_url = reverse_lazy('news_list')
 
     def get_queryset(self):
         return Post.objects.filter(type=Post.NEWS)
