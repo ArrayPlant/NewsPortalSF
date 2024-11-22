@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+{% load static %}
+{% load cache %}
+
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список новостей</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    {% cache 300 'news_list_header' %}
+    <h1>Новости</h1>
+    {% endcache %}
+
+    <div>
+        {% for news_item in page_obj %}
+            {% cache 300 news_item.id %}
+            <h2><a href="{% url 'news_detail' news_item.id %}">{{ news_item.title }}</a></h2>
+            <p>{{ news_item.content|truncatewords:30 }}</p>
+            <p>Опубликовано: {{ news_item.pub_date }}</p>
+            <hr>
+            {% endcache %}
+        {% empty %}
+            <p>Нет доступных новостей.</p>
+        {% endfor %}
+    </div>
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; Первая</a>
+                <a href="?page={{ page_obj.previous_page_number }}">Предыдущая</a>
+            {% endif %}
+
+            <span class="current">
+                Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">Следующая</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">Последняя &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+</body>
+</html>

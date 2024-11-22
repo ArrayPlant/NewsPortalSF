@@ -1,0 +1,20 @@
+<!-- subscriptions.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подписки</title>
+</head>
+<body>
+    <h1>Выберите категории для подписки</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {% for category in categories %}
+            <input type="checkbox" name="categories" value="{{ category.id }}">
+            {{ category.name }}<br>
+        {% endfor %}
+        <button type="submit">Сохранить подписку</button>
+    </form>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% if object %}Редактирование{% else %}Создание{% endif %} поста</title>
+</head>
+<body>
+    <h1>{% if object %}Редактирование{% else %}Создание{% endif %} поста</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        {% if form.errors %}
+            <div style="color: red;">
+                <ul>
+                    {% for field, errors in form.errors.items %}
+                        <li>{{ field }}: {{ errors|join:", " }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <button type="submit">Сохранить</button>
+    </form>
+    <a href="{% url 'news_list' %}">Назад к списку новостей</a>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Поиск новостей</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Поиск новостей</h1>
+    </header>
+
+    <main>
+        <form method="get" action="">
+            <div>
+                <label for="title">Поиск по заголовку:</label>
+                {{ filter.form.title }}
+            </div>
+            <div>
+                <label for="category">Категория:</label>
+                {{ filter.form.category }}
+            </div>
+            <div>
+                <label for="date_after">Дата после:</label>
+                {{ filter.form.date_after }}
+            </div>
+            <div>
+                <button type="submit">Искать</button>
+            </div>
+        </form>
+
+        <h2>Результаты поиска:</h2>
+        {% if filter.qs %}
+        <ul>
+            {% for news in filter.qs %}
+                <li>
+                    <h3>{{ news.title|censor }}</h3>
+                    <p>{{ news.content|censor|slice:":100" }}...</p>
+                    <p>Категория: {{ news.category }}</p>
+                    <p>Дата публикации: {{ news.published_at|date:"d.m.Y H:i" }}</p>
+                    <a href="{% url 'news_detail' news.id %}">Читать далее</a>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <div class="pagination">
+            <span class="step-links">
+                {% if filter.qs.has_previous %}
+                    <a href="?page=1">&laquo; первая</a>
+                    <a href="?page={{ filter.qs.previous_page_number }}">предыдущая</a>
+                {% endif %}
+
+                <span class="current">
+                    Страница {{ filter.qs.number }} из {{ filter.qs.paginator.num_pages }}.
+                </span>
+
+                {% if filter.qs.has_next %}
+                    <a href="?page={{ filter.qs.next_page_number }}">следующая</a>
+                    <a href="?page={{ filter.qs.paginator.num_pages }}">последняя &raquo;</a>
+                {% endif %}
+            </span>
+        </div>
+
+        {% else %}
+            <p>Новости по заданным критериям не найдены.</p>
+        {% endif %}
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Новости</p>
+    </footer>
+</body>
+</html>
